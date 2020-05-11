@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: blue-green-deploy-run
+spec:
+  taskRef:
+    name: blue-green-deploy-k8s
+  params:
+    - name: SERVICE_NAME
+      value: myapp
+    - name: NEW_VERSION
+      value: v1
+    - name: MANIFEST
+      value: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: myapp-v1
+        spec:
+          replicas: 3
+          selector:
+            matchLabels:
+              app: myapp
+              version: 1.11
+          template:
+            metadata:
+              labels:
+                app: "myapp"
+                version: "1.11"
+            spec:
+              containers:
+              - name: myapp
+                image: nginx:1.11
+                imagePullPolicy: IfNotPresent
+                ports:
+                - containerPort: 80
+        

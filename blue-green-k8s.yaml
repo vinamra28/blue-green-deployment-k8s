@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: blue-green-deploy-k8s
+spec:
+  params:
+    - name: SERVICE_NAME
+      type: string
+      description: Name of the service which is pointing to existing deployment
+    - name: NEW_VERSION
+      type: string
+      description: The version of newer deployment which is to be patched to existing service
+    - name: MANIFEST
+      type: string
+      description: The newer version of the deployment to be deployed in another zone 
+  steps:
+    - name: change-deployment
+      image: quay.io/openshift/origin-cli:latest
+      script: |
+        #!/usr/bin/env bash
+
+        getReadyStatus() {
+          local READY
+          i=0
+          for f in $(kubectl get deploy $1 -o jsonpath='{range .status.conditions[*]}{.reason}{"\n"}{end}')
+          do
+            if [[ $f == "MinimumReplicasAvailable" ]]; then
+              READY=$(kubectl get deploy $1 -o jsonpath='{range .status.conditions['$i']}{.status}{"\n"}{end}')
+              echo $READY
+              return
+            fi
+            ((i++))
+          done
+          echo $READY
+        }
+
+        echo "$(params.MANIFEST)" > /tmp/resource.yaml
+        DEPLOYMENTNAME=$(params.SERVICE_NAME)-$(params.NEW_VERSION)
+        SERVICE=$(params.SERVICE_NAME)
+        VERSION=$(params.NEW_VERSION)
+        DEPLOYMENTFILE=/tmp/resource.yaml
+
+        kubectl apply -f $DEPLOYMENTFILE
+
+        # Wait until the Deployment is ready by checking the MinimumReplicasAvailable condition.
+        READY=$(getReadyStatus ${DEPLOYMENTNAME})
+        while [[ "$READY" != "True" ]]; do
+          READY=$(getReadyStatus ${DEPLOYMENTNAME})
+          sleep 5
+        done
+
+        # Update the service selector with the new version
+        kubectl patch svc ${SERVICE} -p "{\"spec\":{\"selector\": {\"app\": \"${SERVICE}\", \"version\": \"${VERSION}\"}}}"
+        echo "Done."
