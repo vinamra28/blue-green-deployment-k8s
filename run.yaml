@@ -9,7 +9,7 @@ spec:
     - name: SERVICE_NAME
       value: myapp
     - name: NEW_VERSION
-      value: v1
+      value: v2
     - name: MANIFEST
       value: |
         apiVersion: apps/v1
@@ -21,16 +21,16 @@ spec:
           selector:
             matchLabels:
               app: myapp
-              version: 1.11
+              version: v2
           template:
             metadata:
               labels:
                 app: "myapp"
-                version: "1.11"
+                version: "v2"
             spec:
               containers:
               - name: myapp
-                image: nginx:1.11
+                image: janakiramm/myapp:v2
                 imagePullPolicy: IfNotPresent
                 ports:
                 - containerPort: 80
