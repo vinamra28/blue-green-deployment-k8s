@@ -11,27 +11,8 @@ spec:
     - name: NEW_VERSION
       value: v2
     - name: MANIFEST
-      value: |
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-          name: myapp-v1
-        spec:
-          replicas: 3
-          selector:
-            matchLabels:
-              app: myapp
-              version: v2
-          template:
-            metadata:
-              labels:
-                app: "myapp"
-                version: "v2"
-            spec:
-              containers:
-              - name: myapp
-                image: janakiramm/myapp:v2
-                imagePullPolicy: IfNotPresent
-                ports:
-                - containerPort: 80
+      value: "https://raw.githubusercontent.com/vinamra28/blue-green-deployment-k8s/master/deployment%2Bservice/blue-deployment.yaml"
+  workspaces: 
+    - name: manifest-dir
+      emptyDir: {}
         

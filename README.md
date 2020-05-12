@@ -6,7 +6,7 @@ One of the challenges with automating deployment is the cut-over itself, taking 
 
 Blue-green deployment also gives you a rapid way to rollback - if anything goes wrong you switch the router back to your blue environment. 
 
-_**Note**_: There should be an existing version of the application deployed which should be replaced with the newer version.
+_**Note**_ : There should be an existing version of the application deployed in blue zone so that newer version of the application can be deployed in the green zone and we can make the service point to the green zone deployment.
 
 ![](./images/blue_green_deployments.png)
 
@@ -22,11 +22,15 @@ kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/v1beta1/blue
 kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/v1beta1/blue-green-deploy/clusterrolebinding.yaml
 ```
 
+## Workspaces
+
+* **manifest-dir**: Deployment file mounted via `ConfigMap` can be provided via the workspaces and the name of the file mounted in the workspace is provided in the _MANIFEST_ params. (Default: _emptyDir:{}_)
+
 ## Parameters
 
 * **SERVICE_NAME**: The service name pointing to the existing deployment. (_Note_: The service name for the new deployment should be same)
 * **NEW_VERSION**: The version of the deployment to be deployed in the green/blue zone
-* **MANIFEST**: The content of the resource to deploy
+* **MANIFEST**: The deployment manifest file name/path to be rolled out.
 
 ## Usage
 
@@ -46,27 +50,8 @@ spec:
     - name: NEW_VERSION
       value: v2
     - name: MANIFEST
-      value: |
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-          name: myapp-v2
-        spec:
-          replicas: 3
-          selector:
-            matchLabels:
-              app: myapp
-              version: v2
-          template:
-            metadata:
-              labels:
-                app: "myapp"
-                version: "v2"
-            spec:
-              containers:
-              - name: myapp
-                image: janakiramm/myapp:v2
-                imagePullPolicy: IfNotPresent
-                ports:
-                - containerPort: 80
+      value: "https://raw.githubusercontent.com/vinamra28/blue-green-deployment-k8s/master/deployment%2Bservice/blue-deployment.yaml"
+  workspaces:
+    - name: manifest-dir
+      emptyDir: {}
 ```
