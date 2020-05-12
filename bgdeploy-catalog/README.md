@@ -8,7 +8,7 @@ Blue-green deployment also gives you a rapid way to rollback - if anything goes 
 
 _**Note**_ : There should be an existing version of the application deployed in blue zone so that newer version of the application can be deployed in the green zone and we can make the service point to the green zone deployment.
 
-![](./images/blue_green_deployments.png)
+![](./blue_green_deployments.png)
 
 
 ## Installing the Task
