@@ -38,7 +38,7 @@ This TaskRun runs the Task to deploy the given Kubernetes resource in the green/
 
 ## Without using ConfigMap
 
-TaskRun :-
+TaskRun:-
 ```
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
