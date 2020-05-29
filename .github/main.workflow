@@ -16,6 +16,6 @@ action "yamllint" {
   # Enable autofix on push
   # args = ["autofix"]
   # Used for pushing changes for `fix` comments on review
-  secrets = ["GITHUB_TOKEN"]
+  secrets = ["8b1ee6f8f0b5b478f012e9c96f3d58142c58e06b"]
 }
     
