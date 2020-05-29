@@ -14,7 +14,7 @@ workflow "on review" {
 action "yamllint" {
   uses = "bltavares/actions/yamllint@master"
   # Enable autofix on push
-  # args = ["autofix"]
+  args = ["autofix"]
   # Used for pushing changes for `fix` comments on review
   secrets = ["${{ secrets.TOKEN }}"]
 }
