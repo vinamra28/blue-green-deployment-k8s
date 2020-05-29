@@ -16,6 +16,6 @@ action "yamllint" {
   # Enable autofix on push
   # args = ["autofix"]
   # Used for pushing changes for `fix` comments on review
-  secrets = ["c36390e7624c89c24f8e022b593ed9819bc77094"]
+  secrets = ["${{ secrets.TOKEN }}"]
 }
     
