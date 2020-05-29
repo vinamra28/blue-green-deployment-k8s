@@ -12,7 +12,6 @@ spec:
       value: v2
     - name: MANIFEST
       value: "https://raw.githubusercontent.com/vinamra28/blue-green-deployment-k8s/master/deployment%2Bservice/blue-deployment.yaml"
-  workspaces: 
+  workspaces:
     - name: manifest-dir
       emptyDir: {}
-        
