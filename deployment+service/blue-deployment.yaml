@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: myapp
-          image: janakiramm/myapp:v1
+          image: quay.io/vinamra2807/social-client:v2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
