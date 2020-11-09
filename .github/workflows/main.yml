@@ -28,7 +28,7 @@ jobs:
       #     go-version: "1.14.10" # The Go version to download (if necessary) and use.
       # - name: Test go
       #   run: echo $(go version)
-      - name: Test s2i
+      - name: Test s2i-before
         run: echo $(whereis curl)
       - name: Install s2i
         # run: GO111MODULE=on go get github.com/openshift/source-to-image/cmd/s2i@master
@@ -36,11 +36,10 @@ jobs:
           curl -Lfs -o source-to-image-v1.3.1-a5a77147-linux-amd64.tar.gz https://github.com/openshift/source-to-image/releases/download/v1.3.1/source-to-image-v1.3.1-a5a77147-linux-amd64.tar.gz
           sudo tar -xzf source-to-image-v1.3.1-a5a77147-linux-amd64.tar.gz
           sudo cp s2i /usr/local/bin/
-          cd /usr/local/bin/
-          chmod +x s2i
+          sudo chmod +x /usr/local/bin/s2i
           s2i version
-      - name: Test s2i
-        run: echo $(whereis curl)
+      - name: Test s2i-after
+        run: echo $(whereis s2i)
       # - run: |
       #     go version
       #     echo "Hello from go"
