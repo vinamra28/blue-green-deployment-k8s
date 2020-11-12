@@ -1,51 +1,44 @@
-name: OC action
+# This is a basic workflow to help you get started with Actions
+
+name: CI
 on: [push]
 
+env:
+  PROJECT: demo-action
+  APP_NAME: myapp
+  RUNNER_OS: linux
+
 jobs:
-  hello_world_job:
+  build:
+    name: Setup and Deploy
     runs-on: ubuntu-latest
-    name: A job to install s2i
+
     steps:
-      - name: Hello world action step
-        id: hello
-        uses: actions/hello-world-javascript-action@v1.1
-        with:
-          who-to-greet: "Mona the Octocat"
-      # Use the output from the `hello` step
-      # - name: Get the output time
-      #   run: echo "The time was ${{ steps.hello.outputs.time }}"
-      # - name: Set up Docker Buildx
-      #   id: buildx
-      #   uses: docker/setup-buildx-action@v1
-      #   with:
-      #     version: latest
-      # - name: Run Hello World
-      #   run: docker run hello-world
-      # - uses: actions/checkout@master
-      # - name: setup-go
-      #   uses: actions/setup-go@v1
-      #   with:
-      #     go-version: "1.14.10" # The Go version to download (if necessary) and use.
-      # - name: Test go
-      #   run: echo $(go version)
-      - name: Test s2i-before
-        run: echo $(whereis curl)
-      - name: Install s2i
-        # run: GO111MODULE=on go get github.com/openshift/source-to-image/cmd/s2i@master
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Maven
         run: |
-          curl -Lfs -o source-to-image-v1.3.1-a5a77147-linux-amd64.tar.gz https://github.com/openshift/source-to-image/releases/download/v1.3.1/source-to-image-v1.3.1-a5a77147-linux-amd64.tar.gz
-          sudo tar -xzf source-to-image-v1.3.1-a5a77147-linux-amd64.tar.gz
-          sudo cp s2i /usr/local/bin/
-          sudo chmod +x /usr/local/bin/s2i
-          s2i version
-      - name: Test s2i-after
-        run: echo $(whereis s2i)
-      # - run: |
-      #     go version
-      #     echo "Hello from go"
-      #     echo ${GOPATH}
-      #     go get github.com/openshift/source-to-image
-      #     cd ${GOPATH}/src/github.com/openshift/source-to-image
-      #     export PATH=$PATH:${GOPATH}/src/github.com/openshift/source-to-image/_output/local/bin/linux/amd64/
-      #     hack/build-go.sh
-      #     s2i version
+          cd ${GITHUB_WORKSPACE}
+          mvn package
+      - name: Lucas Test Build Action
+        uses: lstocchi/buildah-action@0.0.6
+        with:
+          new-image-name: test2
+          base-image: docker.io/fabric8/java-alpine-openjdk11-jre
+          content: target/spring-petclinic-2.3.0.BUILD-SNAPSHOT.jar
+          entrypoint: |
+            java    
+            -jar
+            spring-petclinic-2.3.0.BUILD-SNAPSHOT.jar
+          port: 8080
+      - name: Check image created
+        run: |
+          buildah images
+      - name: Lucas Test Push To Quay Action
+        uses: lstocchi/push-to-quay-action@0.0.2
+        with:
+          image-to-push: test2
+          quay-registry: ${{ secrets.QUAY_REPO }}/testaction
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
